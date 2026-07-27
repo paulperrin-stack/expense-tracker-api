@@ -1,0 +1,28 @@
+{
+  "name": "expense-tracker-api",
+  "version": "1.0.0",
+  "description": "Personal finance tracking API with income, expenses, debts and JWT auth",
+  "homepage": "https://github.com/paulperrin-stack/expense-tracker-api#readme",
+  "bugs": {
+    "url": "https://github.com/paulperrin-stack/expense-tracker-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulperrin-stack/expense-tracker-api.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
