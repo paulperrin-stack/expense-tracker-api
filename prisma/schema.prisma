@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  createdAt   DateTime @default(now())
+  expenses    Expense[]
+  incomes     Income[]
+  debts       Debt[]
+  categories  Category[]
+}
+
+model Expense {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  amount        Decimal  @db.Decimal(10, 2)
+  description   String
+  date          DateTime
+  expenseTags   ExpenseTag[]
+}
+
+model Income {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Decimal  @db.Decimal(10, 2)
+  description String
+  date        DateTime
+  incomeTags  IncomeTag[]
+}
+
+model Debt {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  amount        Decimal  @db.Decimal(10, 2)
+  balance       Decimal  @db.Decimal(10, 2)
+  interestRate  Decimal  @db.Decimal(5, 2)
+  minPayment    Decimal  @db.Decimal(10, 2)
+  description   String
+  date          DateTime
+  debtTags      DebtTag[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  tags        Tag[]
+}
+
+model Tag {
+  id            String   @id @default(cuid())
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+  name          String
+  description   String?
+  expenseTags   ExpenseTag[]
+  incomeTags    IncomeTag[]
+  debtTags      DebtTag[]
+}
+
+model ExpenseTag {
+  expenseId String
+  expense   Expense @relation(fields: [expenseId], references: [id])
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([expenseId, tagId])
+}
+
+model IncomeTag {
+  incomeId String
+  income   Income @relation(fields: [incomeId], references: [id])
+  tagId    String
+  tag      Tag    @relation(fields: [tagId], references: [id])
+
+  @@id([incomeId, tagId])
+}
+
+model DebtTag {
+  debtId String
+  debt   Debt @relation(fields: [debtId], references: [id])
+  tagId  String
+  tag    Tag  @relation(fields: [tagId], references: [id])
+
+  @@id([debtId, tagId])
+}
