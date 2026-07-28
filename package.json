@@ -19,6 +19,7 @@
     "dev": "ts-node-dev --respawn src/server.ts"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.1",
     "prisma": "^7.9.0",
@@ -26,7 +27,9 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "^7.9.0",
+    "bcrypt": "^6.0.0",
     "express": "^5.2.1"
   }
 }
