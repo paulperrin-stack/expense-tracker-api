@@ -1,6 +1,8 @@
+/// <reference path="./types/express.d.ts" />
 import "dotenv/config";
 import express from "express";
 import authRoutes from "./routes/auth.routes";
+// import { authenticateToken } from "./middleware/auth.middleware";
 
 const app = express();
 const port = 3000;
