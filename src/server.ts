@@ -2,7 +2,7 @@
 import "dotenv/config";
 import express from "express";
 import authRoutes from "./routes/auth.routes";
-// import { authenticateToken } from "./middleware/auth.middleware";
+import expenseRoutes from "./routes/expense.routes";
 
 const app = express();
 const port = 3000;
@@ -14,6 +14,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/expenses", expenseRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
