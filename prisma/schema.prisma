@@ -80,7 +80,7 @@ model ExpenseTag {
   @@id([expenseId, tagId])
 }
 
-model IncomeTag {
+model IncomeTag {
   incomeId String
   income   Income @relation(fields: [incomeId], references: [id])
   tagId    String

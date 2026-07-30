@@ -56,26 +56,26 @@ export async function updateTag(req: Request, res: Response) {
         },
     });
 
-    if (category.count === 0) {
-        res.status(404).json({ message: "Category not found" });
+    if (tag.count === 0) {
+        res.status(404).json({ message: "Tag not found" });
         return;
     }
 
-    res.status(200).json({ message: "Category updated successfully" });
+    res.status(200).json({ message: "Tag updated successfully" });
 }
 
-export async function deleteCategory(req: Request, res: Response) {
+export async function deleteTag(req: Request, res: Response) {
     const userId = req.user!.userId;
     const { id } = req.params as { id: string };
 
-    const category = await prisma.category.deleteMany({
-        where: { id, userId },
+    const tag = await prisma.tag.deleteMany({
+        where: { id, category: { userId } },
     });
 
-    if (category.count === 0) {
-        res.status(404).json({ message: "Category not found" });
+    if (tag.count === 0) {
+        res.status(404).json({ message: "Tag not found" });
         return;
     }
 
-    res.status(200).json({ message: "Category deleted successfully" });
+    res.status(200).json({ message: "Tag deleted successfully" });
 }
