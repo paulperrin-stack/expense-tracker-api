@@ -4,6 +4,7 @@ import express from "express";
 import authRoutes from "./routes/auth.routes";
 import expenseRoutes from "./routes/expense.routes";
 import incomeRoutes from "./routes/income.routes";
+import debtRoutes from "./routes/debt.routes";
 
 const app = express();
 const port = 3000;
@@ -17,6 +18,7 @@ app.get("/health", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/expenses", expenseRoutes);
 app.use("/incomes", incomeRoutes);
+app.use("/debts", debtRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
