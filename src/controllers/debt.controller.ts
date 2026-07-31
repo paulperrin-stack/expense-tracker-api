@@ -40,10 +40,21 @@ export async function createDebt(req: Request, res: Response) {
 
 export async function getDebts(req: Request, res: Response) {
     const userId = req.user!.userId;
+    const { month, year, tagId } = req.query;
 
-    const debts = await prisma.debt.findMany({
-        where: { userId },
-    });
+    const where: any = { userId };
+
+    if (month && year) {
+        const startDate = new Date(Number(year), Number(month) - 1, 1);
+        const endDate = new Date(Number(year), Number(month), 1);
+        where.date = { gte: startDate, lt: endDate };
+    }
+
+    if (tagId) {
+        where.debtTags = { some: { tagId } };
+    }
+
+    const debts = await prisma.debt.findMany({ where });
 
     res.status(200).json(debts);
 }
