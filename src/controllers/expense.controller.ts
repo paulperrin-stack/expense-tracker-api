@@ -11,15 +11,28 @@ export async function createExpense(req: Request, res: Response) {
     }
 
     const userId = req.user!.userId;
+    const { tagIds, ...expenseData } = result.data;
 
-    const expense = await prisma.expense.create({
-        data: {
-            ...result.data,
-            date: new Date(result.data.date),
-            userId,
-        },
+    const expense = await prisma.$transaction(async (tx) => {
+        const newExpense = await tx.expense.create({
+            data: {
+                ...expenseData,
+                date: new Date(expenseData.date),
+                userId,
+            },
+        });
+        
+        if (tagIds && tagIds.length > 0) {
+            await tx.expenseTag.createMany({
+                data: tagIds.map((tagId) => ({
+                    expenseId: newExpense.id,
+                    tagId,
+                })),
+            });
+        }
+
+        return newExpense;
     });
-    
     res.status(201).json(expense);
 }
 
@@ -35,7 +48,7 @@ export async function getExpenses(req: Request, res: Response) {
 
 export async function updateExpense(req: Request, res: Response) {
     const userId = req.user!.userId;
-    const { id } = req.params as { id: string };
+    const { id } = req.params as { id: string };
 
     const result = createExpenseSchema.safeParse(req.body);
 
@@ -44,11 +57,13 @@ export async function updateExpense(req: Request, res: Response) {
         return;
     }
 
+    const { tagIds, ...expenseData } = result.data;
+
     const expense = await prisma.expense.updateMany({
         where: { id, userId },
         data: {
-            ...result.data,
-            date: new Date(result.data.date),
+            ...expenseData,
+            date: new Date(expenseData.date),
         },
     });
 
