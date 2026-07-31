@@ -38,7 +38,7 @@ export async function createExpense(req: Request, res: Response) {
 
 export async function getExpenses(req: Request, res: Response) {
     const userId = req.user!.userId;
-    const { month, year } = req.query;
+    const { month, year, tagId } = req.query;
 
     const where: any = { userId };
 
@@ -46,6 +46,10 @@ export async function getExpenses(req: Request, res: Response) {
         const startDate = new Date(Number(year), Number(month) - 1, 1);
         const endDate = new Date(Number(year), Number(month), 1);
         where.date = { gte: startDate, lt: endDate };
+    }
+
+    if (tagId) {
+        where.expenseTags = { some: { tagId } };
     }
 
     const expenses = await prisma.expense.findMany({ where });
