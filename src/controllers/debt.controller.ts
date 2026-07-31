@@ -13,15 +13,28 @@ export async function createDebt(req: Request, res: Response) {
     }
 
     const userId = req.user!.userId;
+    const { tagIds, ...debtData } = result.data;
 
-    const debt = await prisma.debt.create({
-        data: {
-            ...result.data,
-            date: new Date(result.data.date),
-            userId,
-        },
+    const debt = await prisma.$transaction(async (tx) => {
+        const newDebt = await tx.debt.create({
+            data: {
+                ...debtData,
+                date: new Date(debtData.date),
+                userId,
+            },
+        });
+
+        if (tagIds && tagIds.length > 0) {
+            await tx.debtTag.createMany({
+                data: tagIds.map((tagId) => ({
+                    debtId: newDebt.id,
+                    tagId,
+                })),
+            });
+        }
+
+        return newDebt;
     });
-
     res.status(201).json(debt);
 }
 
@@ -46,11 +59,13 @@ export async function updateDebt(req: Request, res: Response) {
         return;
     }
 
+    const { tagIds, ...debtData } = result.data;
+
     const debt = await prisma.debt.updateMany({
         where: { id, userId },
         data: {
-            ...result.data,
-            date: new Date(result.data.date),
+            ...debtData,
+            date: new Date(debtData.date),
         },
     });
 

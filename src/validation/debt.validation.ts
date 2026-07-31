@@ -7,4 +7,5 @@ export const createDebtSchema = z.object({
     minPayment: z.number().positive(),
     description: z.string().min(1),
     date: z.string().datetime(),
-})
+    tagIds: z.array(z.string()).optional(),
+});

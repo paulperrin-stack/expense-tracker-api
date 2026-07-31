@@ -11,15 +11,28 @@ export async function createIncome(req: Request, res: Response) {
     }
 
     const userId = req.user!.userId;
+    const { tagIds, ...incomeData } = result.data;
 
-    const income = await prisma.income.create({
-        data: {
-            ...result.data,
-            date: new Date(result.data.date),
-            userId,
-        },
+    const income = await prisma.$transaction(async (tx) => {
+        const newIncome = await tx.income.create({
+            data: {
+                ...incomeData,
+                date: new Date(incomeData.date),
+                userId,
+            },
+        });
+
+        if (tagIds && tagIds.length > 0) {
+            await tx.incomeTag.createMany({
+                data: tagIds.map((tagId) => ({
+                    incomeId: newIncome.id,
+                    tagId,
+                })),
+            });
+        }
+
+        return newIncome;
     });
-    
     res.status(201).json(income);
 }
 
@@ -44,11 +57,13 @@ export async function updateIncome(req: Request, res: Response) {
         return;
     }
 
+    const { tagIds, ...incomeData } = result.data;
+
     const income = await prisma.income.updateMany({
         where: { id, userId },
         data: {
-            ...result.data,
-            date: new Date(result.data.date),
+            ...incomeData,
+            date: new Date(incomeData.date),
         },
     });
 
