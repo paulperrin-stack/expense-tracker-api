@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../prisma";
 import { createDebtSchema } from "../validation/debt.validation";
+import { calculatePayoff } from "../utils/debtPayoff";
 
 // createDebt, getDebts, updateDebt, deleteDebt
 
@@ -102,4 +103,27 @@ export async function deleteDebt(req: Request, res: Response) {
     }
 
     res.status(200).json({ message: "Debt deleted successfully" });
+}
+
+export async function getPayoffPlan(req: Request, res: Response) {
+    const userId = req.user!.userId;
+    const { extra, strategy } = req.query;
+
+    if (strategy !== "avalanche" && strategy !== "snowball") {
+        res.status(400).json({ message: "strategy must be 'avalanche' or 'snowball'" });
+        return;
+    }
+
+    const debts = await prisma.debt.findMany({ where: { userId } });
+
+    const debtInputs = debts.map((d) => ({
+        id: d.id,
+        balance: Number(d.balance),
+        interestRate: Number(d.interestRate),
+        minPayment: Number(d.minPayment),
+    }));
+
+    const result = calculatePayoff(debtInputs, Number(extra), strategy);
+
+    res.status(200).json(result);
 }

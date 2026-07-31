@@ -38,10 +38,21 @@ export async function createIncome(req: Request, res: Response) {
 
 export async function getIncomes(req: Request, res: Response) {
     const userId = req.user!.userId;
+    const { month, year, tagId } = req.query;
 
-    const incomes = await prisma.income.findMany({
-        where: { userId },
-    });
+    const where: any = { userId };
+
+    if (month && year) {
+        const startDate = new Date(Number(year), Number(month) - 1, 1);
+        const endDate = new Date(Number(year), Number(month), 1);
+        where.date = { gte: startDate, lt: endDate };
+    }
+
+    if (tagId) {
+        where.incomeTags = { some: { tagId } };
+    }
+
+    const incomes = await prisma.income.findMany({ where });
 
     res.status(200).json(incomes);
 }
